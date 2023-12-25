@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Rubik's Cube Project
 
 ## Cube Maker
@@ -29,7 +28,3 @@ Attach a timer function and a movement counting function to each algorithm. Stor
 
 # Data Collection
 Data frame that stores step count and time for each algorithm for each random cube variation. 
-=======
-# Rubiks_Cube
-Rubiks Cube Project 
->>>>>>> origin/main
