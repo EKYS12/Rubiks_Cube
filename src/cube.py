@@ -1,5 +1,5 @@
-import numpy as np
-from block import Block
+import numpy as np # Used to make 3D array of blocks
+from block import Block # Import the block class to populate the cube
 
 class Cube:
     def __init__(self):
@@ -29,6 +29,9 @@ class Cube:
         self.state = 'solved'
 
     def _get_face_colors(self, face_key):
+        '''
+        Helper Method for both string print outs, and state checker. Gets the information of the colors by side of the cube.
+        '''
         # Define the indices for each face
         face_indices = {
             'f': (0, slice(None), slice(None)),
@@ -50,6 +53,9 @@ class Cube:
         return colors
 
     def __str__(self):
+        '''
+        This method is to set up the ability to print out a human readable state of the cube.
+        '''
         sides = 'flrubd'  # Front, Left, Right, Up, Back, Down
         cube_str = ''
         for side in sides:
@@ -61,6 +67,9 @@ class Cube:
         return cube_str
 
     def check_state(self):
+        '''
+        Used to check the current state of the cube on whether it is solved or not.
+        '''
         sides = 'flrubd'  # Front, Left, Right, Up, Back, Down
         for side in sides:
             face_colors = self._get_face_colors(side)
@@ -71,12 +80,55 @@ class Cube:
         self.state = 'solved'
         return print(self.state) # All faces are consistent
 
-    def rotate_clockwise(self, face_block):
+    def _face_layer(self, face):
+        '''
+        Helper function designed to retrieve the layer of a cube surrounding one of the side faces.
+        '''
+        pass
+
+    def _middle_horizontal_layer(self):
+        '''
+        Helper function designed to retrieve the middle layer of the cube on the X axis.
+        '''
+        pass
+
+    def _middle_vertical_layer(self):
+        '''
+        Helper function designed to retrieve the middle layer of the cube on the Y axis.
+        '''
+        pass
+
+    def _middle_slicing_layer(self):
+        '''
+        Helper function designed to retrieve the middle layer of the cube on the Z axis.
+        '''
+       pass
+
+    def _rotate_clockwise(self, layer):
         # Implement clockwise rotation around the specified face block
         # Update cube state
         pass
 
-    def rotate_counter_clockwise(self, face_block):
+    def _rotate_counter_clockwise(self, layer):
         # Implement counter-clockwise rotation around the specified face block
         # Update cube state
         pass
+
+    def rotate(self, center, rotation):
+        if center==cube_center_placeholder: 
+            if middle_horizontal==True:
+                layer = self._middle_horizontal_layer()
+            if middle_vertical==True:
+                layer = self._middle_vertical_layer()
+            if middle_slicing==True:
+                layer = self._middle_slicing_layer()
+        else:
+            layer = self._face_layer(face=center)
+
+        if rotation == "clockwise":
+            self._rotate_clockwise(layer=layer)
+        elif rotation == "counter-clockwise":
+            self._rotate_counter_clockwise(layer=layer)
+
+        return
+
