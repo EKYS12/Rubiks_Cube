@@ -76,59 +76,123 @@ class Cube:
             first_color = face_colors[0][0]
             if not all(color == first_color for row in face_colors for color in row if color):
                 self.state = 'unsolved'
-                return print(self.state) # Found a face with inconsistent color
+                return self.state # Found a face with inconsistent color
         self.state = 'solved'
-        return print(self.state) # All faces are consistent
+        return self.state # All faces are consistent
 
-    def _face_layer(self, face):
+    def _get_layer(self, side):
         '''
         Helper function designed to retrieve the layer of a cube surrounding one of the side faces.
         '''
-        pass
+        sides = ['front', 'left', 'right', 'up', 'back', 'down']
+        if side not in sides:
+            print(f'Invalid side. Valid options are {sides}')
+            return None
+        
+        layer = np.empty((3, 3), dtype=object)  # Placeholder for the 3x3 layer
 
-    def _middle_horizontal_layer(self):
-        '''
-        Helper function designed to retrieve the middle layer of the cube on the X axis.
-        '''
-        pass
+        if side == 'f':
+            # Front layer: All blocks where the first index (i) is 0
+            layer = self.blocks[0, :, :]
+        elif side == 'b':
+            # Back layer: All blocks where the first index (i) is 2
+            layer = self.blocks[2, :, :]
+        elif side == 'l':
+            # Left layer: All blocks where the second index (j) is 0
+            layer = self.blocks[:, 0, :]
+        elif side == 'r':
+            # Right layer: All blocks where the second index (j) is 2
+            layer = self.blocks[:, 2, :]
+        elif side == 'u':
+            # Up layer: All blocks where the third index (k) is 2
+            layer = self.blocks[:, :, 2]
+        elif side == 'd':
+            # Down layer: All blocks where the third index (k) is 0
+            layer = self.blocks[:, :, 0]
 
-    def _middle_vertical_layer(self):
-        '''
-        Helper function designed to retrieve the middle layer of the cube on the Y axis.
-        '''
-        pass
+        return layer
 
-    def _middle_slicing_layer(self):
-        '''
-        Helper function designed to retrieve the middle layer of the cube on the Z axis.
-        '''
-       pass
+    def _center_horizontal_layer(self):
+        # Helper function designed to retrieve the center layer of the cube on the X axis, or k.
+        layer = self.blocks[:, :, 1]
+        return layer
 
-    def _rotate_clockwise(self, layer):
-        # Implement clockwise rotation around the specified face block
-        # Update cube state
-        pass
+    def _center_vertical_layer(self):
+        # Helper function designed to retrieve the center layer of the cube on the Y axis, or j.
+        layer = self.blocks[:, 1, :]
+        return layer
+
+    def _center_slicing_layer(self):
+        # Helper function designed to retrieve the center layer of the cube on the Z axis, or i.
+        layer = self.blocks[1, :, :]
+        return layer
+
+    def _rotate_clockwise(self, side, layer):
+        # Implement clockwise rotation for the specified layer
+        if side == 'front':
+            cube[0, :, :] = np.rot90(cube[0, :, :], k=3)
+        
+        elif side == 'left':
+            cube[2, :, :] = np.rot90(cube[2, :, :].T, k=1).T
+
+        if side == 'right':
+            cube[0, :, :] = np.rot90(cube[0, :, :].T, k=3).T
+
+        elif side == 'up':
+            cube[2, :, :] = np.rot90(cube[2, :, :], k=1)
+
+        if side == 'down':
+            cube[0, :, :] = np.rot90(cube[0, :, :], k=3)
+
+        elif side == 'back':
+            cube[2, :, :] = np.rot90(cube[2, :, :], k=1)
+
+        return
 
     def _rotate_counter_clockwise(self, layer):
-        # Implement counter-clockwise rotation around the specified face block
-        # Update cube state
-        pass
+        # Implement counter-clockwise rotation for the specified layer
+        if side == 'front':
+            cube[0, :, :] = np.rot90(cube[0, :, :], k=1)
+        
+        elif side == 'left':
+            cube[2, :, :] = np.rot90(cube[2, :, :].T, k=3).T
 
-    def rotate(self, center, rotation):
-        if center==cube_center_placeholder: 
-            if middle_horizontal==True:
-                layer = self._middle_horizontal_layer()
-            if middle_vertical==True:
-                layer = self._middle_vertical_layer()
-            if middle_slicing==True:
-                layer = self._middle_slicing_layer()
+        if side == 'right':
+            cube[0, :, :] = np.rot90(cube[0, :, :].T, k=1).T
+
+        elif side == 'up':
+            cube[2, :, :] = np.rot90(cube[2, :, :], k=3)
+
+        if side == 'down':
+            cube[0, :, :] = np.rot90(cube[0, :, :], k=1)
+
+        elif side == 'back':
+            cube[2, :, :] = np.rot90(cube[2, :, :], k=3)
+
+        return
+
+    def rotate(self, side, rotation, center_horizontal=False, center_vertical=False, center_slicing=False):
+        layer = None
+        if side=='center':
+            if center_horizontal:
+                layer = self._center_horizontal_layer()
+            if center_vertical:
+                layer = self._center_vertical_layer()
+            if center_slicing:
+                layer = self._center_slicing_layer()
+            else:
+                print ('Error: Core of cube selected as center of rotation but layer unspecified. Check Args')
+                return
         else:
-            layer = self._face_layer(face=center)
+            layer = self._get_layer(side=side)
+            if layer is None:
+                print('Error: No valid layer selected for rotation. Check Args.')
+                return
 
         if rotation == "clockwise":
-            self._rotate_clockwise(layer=layer)
+            self._rotate_clockwise(side=side, layer=layer)
         elif rotation == "counter-clockwise":
-            self._rotate_counter_clockwise(layer=layer)
+            self._rotate_counter_clockwise(side=side, layer=layer)
 
         return
 
