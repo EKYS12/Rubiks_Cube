@@ -80,119 +80,122 @@ class Cube:
         self.state = 'solved'
         return self.state # All faces are consistent
 
-    def _get_layer(self, side):
+
+    '''
+    Rotation Logic
+
+    Everthing Below is related to the rotational movements of the cube-segments.
+    '''
+    def _get_layer(self, segment):
         '''
-        Helper function designed to retrieve the layer of a cube surrounding one of the side faces.
+        Helper method designed to retrieve the layer of a cube.
         '''
-        sides = ['front', 'left', 'right', 'up', 'back', 'down']
-        if side not in sides:
-            print(f'Invalid side. Valid options are {sides}')
+        segments = ['front', 'left', 'right', 'up', 'back', 'down', 'c-horizontal', 'c-vertical', 'c-slicing']
+        if segment not in segments:
+            print(f'Invalid segment. Valid options are {segments}')
             return None
         
-        layer = np.empty((3, 3), dtype=object)  # Placeholder for the 3x3 layer
+        layer = None
 
-        if side == 'f':
+        if segment == 'front':
             # Front layer: All blocks where the first index (i) is 0
             layer = self.blocks[0, :, :]
-        elif side == 'b':
+        if segment == 'back':
             # Back layer: All blocks where the first index (i) is 2
             layer = self.blocks[2, :, :]
-        elif side == 'l':
+        if segment == 'left':
             # Left layer: All blocks where the second index (j) is 0
             layer = self.blocks[:, 0, :]
-        elif side == 'r':
+        if segment == 'right':
             # Right layer: All blocks where the second index (j) is 2
             layer = self.blocks[:, 2, :]
-        elif side == 'u':
+        if segment == 'up':
             # Up layer: All blocks where the third index (k) is 2
-            layer = self.blocks[:, :, 2]
-        elif side == 'd':
-            # Down layer: All blocks where the third index (k) is 0
             layer = self.blocks[:, :, 0]
+        if segment == 'down':
+            # Down layer: All blocks where the third index (k) is 0
+            layer = self.blocks[:, :, 2]
+        if segment == 'c-horizontal':
+            # Center Horizontal layer: All blocks where the third index (k) is 1
+            layer = self.blocks[:, :, 1]
+        if segment == 'c-vertical':
+            # Center Vertical layer: All blocks where the third index (j) is 1
+            layer = self.blocks[:, 1, :]
+        if segment == 'c-slicing':
+            # Center Slicing layer: All blocks where the third index (i) is 1
+            layer = self.blocks[1, :, :]
 
         return layer
 
-    def _center_horizontal_layer(self):
-        # Helper function designed to retrieve the center layer of the cube on the X axis, or k.
-        layer = self.blocks[:, :, 1]
-        return layer
-
-    def _center_vertical_layer(self):
-        # Helper function designed to retrieve the center layer of the cube on the Y axis, or j.
-        layer = self.blocks[:, 1, :]
-        return layer
-
-    def _center_slicing_layer(self):
-        # Helper function designed to retrieve the center layer of the cube on the Z axis, or i.
-        layer = self.blocks[1, :, :]
-        return layer
-
-    def _rotate_clockwise(self, side, layer):
+    def _rotate_clockwise(self, segment, layer):
         # Implement clockwise rotation for the specified layer
-        if side == 'front':
-            cube[0, :, :] = np.rot90(cube[0, :, :], k=3)
+        if segment == 'front':
+            layer = np.rot90(layer, k=3)
         
-        elif side == 'left':
-            cube[2, :, :] = np.rot90(cube[2, :, :].T, k=1).T
+        if segment == 'left':
+            layer = np.rot90(layer.T, k=1).T
 
-        if side == 'right':
-            cube[0, :, :] = np.rot90(cube[0, :, :].T, k=3).T
+        if segment == 'right':
+            layer = np.rot90(layer.T, k=3).T
 
-        elif side == 'up':
-            cube[2, :, :] = np.rot90(cube[2, :, :], k=1)
+        if segment == 'up':
+            layer = np.rot90(layer, k=1)
 
-        if side == 'down':
-            cube[0, :, :] = np.rot90(cube[0, :, :], k=3)
+        if segment == 'down':
+            layer = np.rot90(layer, k=3)
 
-        elif side == 'back':
-            cube[2, :, :] = np.rot90(cube[2, :, :], k=1)
+        if segment == 'back':
+            layer = np.rot90(layer, k=1)
+        
+        ####
+        # The rotations on these are placeholder and need to be corrected
+        ####
+        if segment == 'c-horizontal':
+            layer = np.rot90(layer, k=1)
+
+        if segment == 'c-vertical':
+            layer = np.rot90(layer, k=1)
+
+        if segment == 'c-slicing':
+            layer = np.rot90(layer, k=1)
 
         return
+
 
     def _rotate_counter_clockwise(self, layer):
         # Implement counter-clockwise rotation for the specified layer
-        if side == 'front':
-            cube[0, :, :] = np.rot90(cube[0, :, :], k=1)
+        if segment == 'front':
+            layer = np.rot90(layer, k=1)
         
-        elif side == 'left':
-            cube[2, :, :] = np.rot90(cube[2, :, :].T, k=3).T
+        if segment == 'left':
+            layer = np.rot90(layer.T, k=3).T
 
-        if side == 'right':
-            cube[0, :, :] = np.rot90(cube[0, :, :].T, k=1).T
+        if segment == 'right':
+            layer = np.rot90(layer.T, k=1).T
 
-        elif side == 'up':
-            cube[2, :, :] = np.rot90(cube[2, :, :], k=3)
+        if segment == 'up':
+            layer = np.rot90(layer, k=3)
 
-        if side == 'down':
-            cube[0, :, :] = np.rot90(cube[0, :, :], k=1)
+        if segment == 'down':
+            layer = np.rot90(layer, k=1)
 
-        elif side == 'back':
-            cube[2, :, :] = np.rot90(cube[2, :, :], k=3)
+        if segment == 'back':
+            layer = np.rot90(layer, k=3)
 
         return
 
-    def rotate(self, side, rotation, center_horizontal=False, center_vertical=False, center_slicing=False):
+    def rotate(self, segment, rotation):
         layer = None
-        if side=='center':
-            if center_horizontal:
-                layer = self._center_horizontal_layer()
-            if center_vertical:
-                layer = self._center_vertical_layer()
-            if center_slicing:
-                layer = self._center_slicing_layer()
-            else:
-                print ('Error: Core of cube selected as center of rotation but layer unspecified. Check Args')
-                return
-        else:
-            layer = self._get_layer(side=side)
-            if layer is None:
-                print('Error: No valid layer selected for rotation. Check Args.')
-                return
+
+        layer = self._get_layer(segment=segment)
+        if layer is None:
+            print('Error: No valid layer selected for rotation. Check Args.')
+            return
 
         if rotation == "clockwise":
-            self._rotate_clockwise(side=side, layer=layer)
-        elif rotation == "counter-clockwise":
-            self._rotate_counter_clockwise(side=side, layer=layer)
+            self._rotate_clockwise(segment=segment, layer=layer)
+        if rotation == "counter-clockwise":
+            self._rotate_counter_clockwise(segment=segment, layer=layer)
 
         return
 
