@@ -28,6 +28,30 @@ class Cube:
 
         self.state = 'solved'
 
+        '''
+        Making views of the different layers of the Cube
+        '''
+
+        # Front layer: All blocks where the first index (i) is 0
+        self.front = self.blocks[0, :, :]
+        # Back layer: All blocks where the first index (i) is 2
+        self.back = self.blocks[2, :, :]
+        # Left layer: All blocks where the second index (j) is 0
+        self.left = self.blocks[:, 0, :]
+        # Right layer: All blocks where the second index (j) is 2
+        self.right = self.blocks[:, 2, :]
+        # Up layer: All blocks where the third index (k) is 2
+        self.up = self.blocks[:, :, 0]
+        # Down layer: All blocks where the third index (k) is 0
+        self.down = self.blocks[:, :, 2]
+        # Center Horizontal layer: All blocks where the third index (k) is 1
+        self.c_horizontal = self.blocks[:, :, 1]
+        # Center Vertical layer: All blocks where the third index (j) is 1
+        self.c_vertical = self.blocks[:, 1, :]
+        # Center Slicing layer: All blocks where the third index (i) is 1
+        self.c_slicing = self.blocks[1, :, :]
+
+
     def _get_face_colors(self, face_key):
         '''
         Helper Method for both string print outs, and state checker. Gets the information of the colors by side of the cube.
@@ -92,38 +116,37 @@ class Cube:
         '''
         segments = ['front', 'left', 'right', 'up', 'back', 'down', 'c-horizontal', 'c-vertical', 'c-slicing']
         if segment not in segments:
-            print(f'Invalid segment. Valid options are {segments}')
-            return None
+            raise ValueError(f'Invalid segment. Valid options are {segments}')
         
         layer = None
 
         if segment == 'front':
             # Front layer: All blocks where the first index (i) is 0
-            layer = self.blocks[0, :, :]
+            layer = self.front
         if segment == 'back':
             # Back layer: All blocks where the first index (i) is 2
-            layer = self.blocks[2, :, :]
+            layer = self.back
         if segment == 'left':
             # Left layer: All blocks where the second index (j) is 0
-            layer = self.blocks[:, 0, :]
+            layer = self.left
         if segment == 'right':
             # Right layer: All blocks where the second index (j) is 2
-            layer = self.blocks[:, 2, :]
+            layer = self.right
         if segment == 'up':
             # Up layer: All blocks where the third index (k) is 2
-            layer = self.blocks[:, :, 0]
+            layer = self.up
         if segment == 'down':
             # Down layer: All blocks where the third index (k) is 0
-            layer = self.blocks[:, :, 2]
+            layer = self.down
         if segment == 'c-horizontal':
             # Center Horizontal layer: All blocks where the third index (k) is 1
-            layer = self.blocks[:, :, 1]
+            layer = self.c_horizontal
         if segment == 'c-vertical':
             # Center Vertical layer: All blocks where the third index (j) is 1
-            layer = self.blocks[:, 1, :]
+            layer = self.c_vertical
         if segment == 'c-slicing':
             # Center Slicing layer: All blocks where the third index (i) is 1
-            layer = self.blocks[1, :, :]
+            layer = self.c_slicing
 
         return layer
 
@@ -182,15 +205,22 @@ class Cube:
         if segment == 'back':
             layer = np.rot90(layer, k=3)
 
+        ####
+        # The rotations on these are placeholder and need to be corrected
+        ####
+        if segment == 'c-horizontal':
+            layer = np.rot90(layer, k=1)
+
+        if segment == 'c-vertical':
+            layer = np.rot90(layer, k=1)
+
+        if segment == 'c-slicing':
+            layer = np.rot90(layer, k=1)
+
         return
 
     def rotate(self, segment, rotation):
-        layer = None
-
         layer = self._get_layer(segment=segment)
-        if layer is None:
-            print('Error: No valid layer selected for rotation. Check Args.')
-            return
 
         if rotation == "clockwise":
             self._rotate_clockwise(segment=segment, layer=layer)
