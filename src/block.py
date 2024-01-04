@@ -24,6 +24,6 @@ class Block:
 
     def movement(self, movement_log):
         for movement in movement_log:
-            current_face, new_face = movement
-            self.color_dict[current_face], self.color_dict[new_face] = self.color_dict[new_face], self.color_dict[current_face]
+            face1, face2 = movement
+            self.color_dict[face1], self.color_dict[face2] = self.color_dict[face1], self.color_dict[face2]
         return self.color_dict

@@ -15,12 +15,12 @@ class Cube:
                 for k in range(3):
                     # Simplified color_dict based on position, for a solved cube
                     color_dict = {
-                        'f': face_colors[0] if i == 0 else None,
-                        'l': face_colors[1] if j == 0 else None,
-                        'r': face_colors[2] if j == 2 else None,
-                        'd': face_colors[3] if k == 0 else None,
-                        'b': face_colors[4] if i == 2 else None,
-                        'u': face_colors[5] if k == 2 else None,
+                        'front': face_colors[0] if i == 0 else None,
+                        'left': face_colors[1] if j == 0 else None,
+                        'right': face_colors[2] if j == 2 else None,
+                        'down': face_colors[3] if k == 0 else None,
+                        'back': face_colors[4] if i == 2 else None,
+                        'up': face_colors[5] if k == 2 else None,
                     }
                     # Derive Face Count from number of colored sides
                     face_count = sum(color is not None for color in color_dict.values())
@@ -48,70 +48,7 @@ class Cube:
         # Center Slicing layer: All blocks where the third index (i) is 1
         self.c_slicing = self.blocks[1, :, :]
 
-
-    def _get_face_colors(self, face_key):
-        '''
-        Helper Method for both string print outs, and state checker. Gets the information of the colors by side of the cube.
-        '''
-        # Define the indices for each face
-        face_indices = {
-            'f': (0, slice(None), slice(None)),
-            'b': (2, slice(None), slice(None)),
-            'l': (slice(None), 0, slice(None)),
-            'r': (slice(None), 2, slice(None)),
-            'u': (slice(None), slice(None), 2),
-            'd': (slice(None), slice(None), 0),
-        }
-
-        indices = face_indices[face_key]
-        colors = [[None]*3 for _ in range(3)]  # Initialize a 3x3 matrix of None
-
-        for i in range(3):
-            for j in range(3):
-                block = self.blocks[indices[0], indices[1], indices[2]][i, j]
-                colors[i][j] = block.color_dict[face_key]
-
-        return colors
-
-    def __str__(self):
-        '''
-        This method is to set up the ability to print out a human readable state of the cube.
-        '''
-        sides = 'flrubd'  # Front, Left, Right, Up, Back, Down
-        cube_str = ''
-        for side in sides:
-            cube_str += side.upper() + '\n'  # Print the name of the side
-            face_colors = self._get_face_colors(side)
-            for row in face_colors:
-                cube_str += ''.join(color[0] if color else ' ' for color in row) + '\n'
-            cube_str += '\n'
-        return cube_str
-
-    def check_state(self):
-        '''
-        Used to check the current state of the cube on whether it is solved or not.
-        '''
-        sides = 'flrubd'  # Front, Left, Right, Up, Back, Down
-        for side in sides:
-            face_colors = self._get_face_colors(side)
-            first_color = face_colors[0][0]
-            if not all(color == first_color for row in face_colors for color in row if color):
-                self.state = 'unsolved'
-                return self.state # Found a face with inconsistent color
-        self.state = 'solved'
-        return self.state # All faces are consistent
-
-
-    '''
-    Rotation Logic
-
-    Everthing Below is related to the rotational movements of the cube-segments.
-    '''
-
-    def _get_layer(self, segment):
-        '''
-        Helper method designed to retrieve the layer of a cube.
-        '''
+        # Dictionary of segment keys and segment values
         segment_map = {
             'front': self.front,
             'back': self.back,
@@ -124,6 +61,77 @@ class Cube:
             'c_slicing': self.c_slicing
         }
 
+        self.segment_indices = {
+            'front': (0, slice(None), slice(None)),
+            'back': (2, slice(None), slice(None)),
+            'left': (slice(None), slice(None), 0),
+            'right': (slice(None), slice(None), 2),
+            'up': (slice(None), 0, slice(None)),
+            'down': (slice(None), 2, slice(None)),
+            'c_horizontal': (slice(None), 1, slice(None)),
+            'c_vertical': (1, slice(None), slice(None)),
+            'c_slicing': (slice(None), slice(None), 1),
+        }
+
+    def _get_face_colors(self, face_key):
+        '''
+        Helper Method to retrieve colors of a specific face of the cube.
+        '''
+        indices = self.segment_indices.get(face_key)
+        if not indices:
+            raise ValueError(f"Invalid face key: {face_key}")
+
+        # Initialize a 3x3 matrix of None
+        colors = [[None] * 3 for _ in range(3)]
+
+        # Accessing the color of each block in the face and storing it
+        for i in range(3):
+            for j in range(3):
+                block = self.blocks[indices][i, j]
+                colors[i][j] = block.color_dict[face_key]
+
+        return colors
+
+    def __str__(self):
+        '''
+        Return a human-readable string representation of the cube's state.
+        '''
+        sides = ['front', 'left', 'right', 'up', 'back', 'down']  # Use full names as keys
+        cube_str = ''
+        for side in sides:
+            cube_str += f"{side.capitalize()} Side:\n"
+            face_colors = self._get_face_colors(side)
+            for row in face_colors:
+                cube_str += ''.join(color[0] if color else ' ' for color in row) + '\n'
+            cube_str += '\n'
+        return cube_str
+
+    def check_state(self):
+        '''
+        Checks the current state of the cube to determine if it's solved.
+        '''
+        sides = ['front', 'left', 'right', 'up', 'back', 'down']  # Use full names as keys
+        for side in sides:
+            face_colors = self._get_face_colors(side)
+            # Assuming the first color in each face is representative of that face's color
+            first_color = face_colors[0][0]
+            if not all(color == first_color for row in face_colors for color in row if color):
+                self.state = 'unsolved'
+                return 'Unsolved'  # Found a face with inconsistent color
+        self.state = 'solved'
+        return 'Solved'  # All faces are consistent
+
+    '''
+    Rotation Logic
+
+    Everthing Below is related to the rotational movements of the cube-segments.
+    '''
+
+    def _get_layer(self, segment):
+        '''
+        Helper method designed to retrieve the layer of a cube.
+        '''
+        
         # Validate segment
         if segment not in segment_map:
             raise ValueError(f'Invalid segment. Valid options are {list(segment_map.keys())}')
@@ -138,10 +146,13 @@ class Cube:
         '''
         
         # Get Layer to be rotated
-        layer = self._get_layer(segment=segment)
-        
-        # Create a copy of the layer to work on, incase the layer needs to be transposed
-        layer_r = layer.copy()
+        # layer = self._get_layer(segment=segment)
+
+        indices = self.segment_indices.get(segment)
+        if not indices:
+            raise ValueError(f"Invalid segment: {segment}")
+
+        layer = self.blocks[indices].copy()
 
         TRANSPOSE = False
 
@@ -160,15 +171,15 @@ class Cube:
 
         # Set tranpose flag for vertical layers
         if segment in ['left', 'right', 'c_vertical']:
-            layer_r = layer_r.T
+            layer = layer.T
             TRANSPOSE = True
 
-        layer = np.rot90(layer_r, k=ROTATION)
+        layer_r = np.rot90(layer, k=ROTATION)
 
         if TRANSPOSE:
-            layer = layer.T
+            layer_r = layer_r.T
 
-        del layer_r
+        self.blocks[indices] = layer_r
 
         return
 
