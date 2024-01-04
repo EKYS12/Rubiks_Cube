@@ -28,26 +28,23 @@ class Cube:
 
         self.state = 'solved'
 
-        '''
-        Making views of the different layers of the Cube
-        '''
-
+        # Making views of the different layers of the Cube
         # Front layer: All blocks where the first index (i) is 0
         self.front = self.blocks[0, :, :]
         # Back layer: All blocks where the first index (i) is 2
         self.back = self.blocks[2, :, :]
         # Left layer: All blocks where the second index (j) is 0
-        self.left = self.blocks[:, 0, :]
+        self.left = self.blocks[:, :, 0]
         # Right layer: All blocks where the second index (j) is 2
-        self.right = self.blocks[:, 2, :]
+        self.right = self.blocks[:, :, 2]
         # Up layer: All blocks where the third index (k) is 2
-        self.up = self.blocks[:, :, 0]
+        self.up = self.blocks[:, 0, :]
         # Down layer: All blocks where the third index (k) is 0
-        self.down = self.blocks[:, :, 2]
+        self.down = self.blocks[:, 2, :]
         # Center Horizontal layer: All blocks where the third index (k) is 1
-        self.c_horizontal = self.blocks[:, :, 1]
+        self.c_horizontal = self.blocks[:, 1, :]
         # Center Vertical layer: All blocks where the third index (j) is 1
-        self.c_vertical = self.blocks[:, 1, :]
+        self.c_vertical = self.blocks[:, :, 1]
         # Center Slicing layer: All blocks where the third index (i) is 1
         self.c_slicing = self.blocks[1, :, :]
 
@@ -110,122 +107,83 @@ class Cube:
 
     Everthing Below is related to the rotational movements of the cube-segments.
     '''
+
     def _get_layer(self, segment):
         '''
         Helper method designed to retrieve the layer of a cube.
         '''
-        segments = ['front', 'left', 'right', 'up', 'back', 'down', 'c-horizontal', 'c-vertical', 'c-slicing']
-        if segment not in segments:
-            raise ValueError(f'Invalid segment. Valid options are {segments}')
-        
-        layer = None
+        segment_map = {
+            'front': self.front,
+            'back': self.back,
+            'left': self.left,
+            'right': self.right,
+            'up': self.up,
+            'down': self.down,
+            'c_horizontal': self.c_horizontal,
+            'c_vertical': self.c_vertical,
+            'c_slicing': self.c_slicing
+        }
 
-        if segment == 'front':
-            # Front layer: All blocks where the first index (i) is 0
-            layer = self.front
-        if segment == 'back':
-            # Back layer: All blocks where the first index (i) is 2
-            layer = self.back
-        if segment == 'left':
-            # Left layer: All blocks where the second index (j) is 0
-            layer = self.left
-        if segment == 'right':
-            # Right layer: All blocks where the second index (j) is 2
-            layer = self.right
-        if segment == 'up':
-            # Up layer: All blocks where the third index (k) is 2
-            layer = self.up
-        if segment == 'down':
-            # Down layer: All blocks where the third index (k) is 0
-            layer = self.down
-        if segment == 'c-horizontal':
-            # Center Horizontal layer: All blocks where the third index (k) is 1
-            layer = self.c_horizontal
-        if segment == 'c-vertical':
-            # Center Vertical layer: All blocks where the third index (j) is 1
-            layer = self.c_vertical
-        if segment == 'c-slicing':
-            # Center Slicing layer: All blocks where the third index (i) is 1
-            layer = self.c_slicing
+        # Validate segment
+        if segment not in segment_map:
+            raise ValueError(f'Invalid segment. Valid options are {list(segment_map.keys())}')
 
+        # Return the corresponding layer
+        layer = segment_map[segment]
         return layer
 
-    def _rotate_clockwise(self, segment, layer):
-        # Implement clockwise rotation for the specified layer
-        if segment == 'front':
-            layer = np.rot90(layer, k=3)
+    def rotate(self, segment, clockwise=True):
+        '''
+        Function used to rotate the different layers of the cube.
+        '''
         
-        if segment == 'left':
-            layer = np.rot90(layer.T, k=1).T
-
-        if segment == 'right':
-            layer = np.rot90(layer.T, k=3).T
-
-        if segment == 'up':
-            layer = np.rot90(layer, k=1)
-
-        if segment == 'down':
-            layer = np.rot90(layer, k=3)
-
-        if segment == 'back':
-            layer = np.rot90(layer, k=1)
-        
-        ####
-        # The rotations on these are placeholder and need to be corrected
-        ####
-        if segment == 'c-horizontal':
-            layer = np.rot90(layer, k=1)
-
-        if segment == 'c-vertical':
-            layer = np.rot90(layer, k=1)
-
-        if segment == 'c-slicing':
-            layer = np.rot90(layer, k=1)
-
-        return
-
-
-    def _rotate_counter_clockwise(self, layer):
-        # Implement counter-clockwise rotation for the specified layer
-        if segment == 'front':
-            layer = np.rot90(layer, k=1)
-        
-        if segment == 'left':
-            layer = np.rot90(layer.T, k=3).T
-
-        if segment == 'right':
-            layer = np.rot90(layer.T, k=1).T
-
-        if segment == 'up':
-            layer = np.rot90(layer, k=3)
-
-        if segment == 'down':
-            layer = np.rot90(layer, k=1)
-
-        if segment == 'back':
-            layer = np.rot90(layer, k=3)
-
-        ####
-        # The rotations on these are placeholder and need to be corrected
-        ####
-        if segment == 'c-horizontal':
-            layer = np.rot90(layer, k=1)
-
-        if segment == 'c-vertical':
-            layer = np.rot90(layer, k=1)
-
-        if segment == 'c-slicing':
-            layer = np.rot90(layer, k=1)
-
-        return
-
-    def rotate(self, segment, rotation):
+        # Get Layer to be rotated
         layer = self._get_layer(segment=segment)
+        
+        # Create a copy of the layer to work on, incase the layer needs to be transposed
+        layer_r = layer.copy()
 
-        if rotation == "clockwise":
-            self._rotate_clockwise(segment=segment, layer=layer)
-        if rotation == "counter-clockwise":
-            self._rotate_counter_clockwise(segment=segment, layer=layer)
+        TRANSPOSE = False
+
+        # LAYERS WERE POSSIBLY INCORRECT HAVE TO RECHECK WHAT GOES WHERE
+
+        # Set Values for Rotation depending on clockwise or counter clockwise 
+        if segment in ['front', 'right', 'down', 'c_slicing']:
+            if clockwise:
+                ROTATION = 3
+            else:
+                ROTATION = 1
+        
+        if segment in ['left', 'up', 'back']:
+            if clockwise:
+                ROTATION = 1
+            else:
+                ROTATION = 3
+
+        # Set tranpose flag for left and right
+        if segment in ['left', 'right']:
+            layer_r = layer_r.T
+            TRANSPOSE = True
+       
+        ####
+        # The ROTATIONs on these are placeholder and need to be corrected
+        ####
+        '''
+        if segment == 'c_horizontal':
+            ROTATION = 1
+
+        if segment == 'c_vertical':
+            ROTATION = 1
+            TRANSPOSE = False
+
+        '''
+
+        layer = np.rot90(layer_r, k=ROTATION)
+
+        if TRANSPOSE:
+            layer = layer.T
+
+        del layer_r
 
         return
 
