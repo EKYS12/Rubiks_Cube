@@ -33,17 +33,17 @@ class Cube:
         self.front = self.blocks[0, :, :]
         # Back layer: All blocks where the first index (i) is 2
         self.back = self.blocks[2, :, :]
-        # Left layer: All blocks where the second index (j) is 0
+        # Left layer: All blocks where the third index (k) is 0
         self.left = self.blocks[:, :, 0]
-        # Right layer: All blocks where the second index (j) is 2
+        # Right layer: All blocks where the third index (k) is 2
         self.right = self.blocks[:, :, 2]
-        # Up layer: All blocks where the third index (k) is 2
+        # Up layer: All blocks where the second index (j) is 0
         self.up = self.blocks[:, 0, :]
-        # Down layer: All blocks where the third index (k) is 0
+        # Down layer: All blocks where the second index (j) is 2
         self.down = self.blocks[:, 2, :]
-        # Center Horizontal layer: All blocks where the third index (k) is 1
+        # Center Horizontal layer: All blocks where the second index (j) is 1
         self.c_horizontal = self.blocks[:, 1, :]
-        # Center Vertical layer: All blocks where the third index (j) is 1
+        # Center Vertical layer: All blocks where the third index (k) is 1
         self.c_vertical = self.blocks[:, :, 1]
         # Center Slicing layer: All blocks where the third index (i) is 1
         self.c_slicing = self.blocks[1, :, :]
@@ -145,38 +145,23 @@ class Cube:
 
         TRANSPOSE = False
 
-        # LAYERS WERE POSSIBLY INCORRECT HAVE TO RECHECK WHAT GOES WHERE
-
         # Set Values for Rotation depending on clockwise or counter clockwise 
-        if segment in ['front', 'right', 'down', 'c_slicing']:
+        if segment in ['front', 'right', 'down', 'c_slicing', 'c_vertical']:
             if clockwise:
                 ROTATION = 3
             else:
                 ROTATION = 1
         
-        if segment in ['left', 'up', 'back']:
+        if segment in ['left', 'up', 'back', 'c_horizontal']:
             if clockwise:
                 ROTATION = 1
             else:
                 ROTATION = 3
 
-        # Set tranpose flag for left and right
-        if segment in ['left', 'right']:
+        # Set tranpose flag for vertical layers
+        if segment in ['left', 'right', 'c_vertical']:
             layer_r = layer_r.T
             TRANSPOSE = True
-       
-        ####
-        # The ROTATIONs on these are placeholder and need to be corrected
-        ####
-        '''
-        if segment == 'c_horizontal':
-            ROTATION = 1
-
-        if segment == 'c_vertical':
-            ROTATION = 1
-            TRANSPOSE = False
-
-        '''
 
         layer = np.rot90(layer_r, k=ROTATION)
 
