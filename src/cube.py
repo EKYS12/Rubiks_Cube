@@ -3,8 +3,8 @@ from block import Block # Import the block class to populate the cube
 
 class Cube:
     def __init__(self):
-        # Colors for each face in the order front, left, right, down, back, up
-        face_colors = ['white', 'green', 'blue', 'orange', 'yellow', 'red']
+        # Colors for each face
+        self.face_colors = ['white', 'green', 'blue', 'orange', 'yellow', 'red']
         
         # Initialize the 3x3x3 array of blocks
         self.blocks = np.empty((3, 3, 3), dtype=object)
@@ -15,12 +15,12 @@ class Cube:
                 for k in range(3):
                     # Simplified color_dict based on position, for a solved cube
                     color_dict = {
-                        'front': face_colors[0] if i == 0 else None,
-                        'left': face_colors[1] if j == 0 else None,
-                        'right': face_colors[2] if j == 2 else None,
-                        'down': face_colors[3] if k == 0 else None,
-                        'back': face_colors[4] if i == 2 else None,
-                        'up': face_colors[5] if k == 2 else None,
+                        'front': self.face_colors[0] if i == 0 else None,
+                        'left': self.face_colors[1] if j == 0 else None,
+                        'right': self.face_colors[2] if j == 2 else None,
+                        'down': self.face_colors[3] if k == 0 else None,
+                        'back': self.face_colors[4] if i == 2 else None,
+                        'up': self.face_colors[5] if k == 2 else None,
                     }
                     # Derive Face Count from number of colored sides
                     face_count = sum(color is not None for color in color_dict.values())
@@ -48,19 +48,7 @@ class Cube:
         # Center Slicing layer: All blocks where the third index (i) is 1
         self.c_slicing = self.blocks[1, :, :]
 
-        # Dictionary of segment keys and segment values
-        segment_map = {
-            'front': self.front,
-            'back': self.back,
-            'left': self.left,
-            'right': self.right,
-            'up': self.up,
-            'down': self.down,
-            'c_horizontal': self.c_horizontal,
-            'c_vertical': self.c_vertical,
-            'c_slicing': self.c_slicing
-        }
-
+        # Dictionary of segment keys and segment index values
         self.segment_indices = {
             'front': (0, slice(None), slice(None)),
             'back': (2, slice(None), slice(None)),
@@ -121,32 +109,13 @@ class Cube:
         self.state = 'solved'
         return 'Solved'  # All faces are consistent
 
-    '''
-    Rotation Logic
-
-    Everthing Below is related to the rotational movements of the cube-segments.
-    '''
-
-    def _get_layer(self, segment):
-        '''
-        Helper method designed to retrieve the layer of a cube.
-        '''
-        
-        # Validate segment
-        if segment not in segment_map:
-            raise ValueError(f'Invalid segment. Valid options are {list(segment_map.keys())}')
-
-        # Return the corresponding layer
-        layer = segment_map[segment]
-        return layer
-
     def rotate(self, segment, clockwise=True):
         '''
         Function used to rotate the different layers of the cube.
+
+        segment: Layer to be rotated
+        clockwise: Default value is True. Boolean that determines clockwise or counterclockwise rotation.
         '''
-        
-        # Get Layer to be rotated
-        # layer = self._get_layer(segment=segment)
 
         indices = self.segment_indices.get(segment)
         if not indices:
