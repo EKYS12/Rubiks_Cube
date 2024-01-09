@@ -148,6 +148,9 @@ class Cube:
         if TRANSPOSE:
             layer_r = layer_r.T
 
+            
+
+
         self.blocks[indices] = layer_r
 
         return
