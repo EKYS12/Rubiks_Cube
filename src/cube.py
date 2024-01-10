@@ -18,9 +18,9 @@ class Cube:
                         'front': self.face_colors[0] if i == 0 else None,
                         'left': self.face_colors[1] if j == 0 else None,
                         'right': self.face_colors[2] if j == 2 else None,
-                        'down': self.face_colors[3] if k == 0 else None,
+                        'down': self.face_colors[3] if k == 2 else None,
                         'back': self.face_colors[4] if i == 2 else None,
-                        'up': self.face_colors[5] if k == 2 else None,
+                        'up': self.face_colors[5] if k == 0 else None,
                     }
                     # Derive Face Count from number of colored sides
                     face_count = sum(color is not None for color in color_dict.values())
@@ -148,8 +148,9 @@ class Cube:
         if TRANSPOSE:
             layer_r = layer_r.T
 
-            
-
+        for i in range(3):
+            for j in range(3):
+                layer_r[i, j] = layer_r[i, j].movement(segment, clockwise)
 
         self.blocks[indices] = layer_r
 
