@@ -86,4 +86,4 @@ class Block:
             face1, face2 = movement
             color_copy = self.color_dict.copy()
             self.color_dict[face1] = color_copy[face2]
-        return self.color_dict
+        return 

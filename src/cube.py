@@ -16,11 +16,11 @@ class Cube:
                     # Simplified color_dict based on position, for a solved cube
                     color_dict = {
                         'front': self.face_colors[0] if i == 0 else None,
-                        'left': self.face_colors[1] if j == 0 else None,
-                        'right': self.face_colors[2] if j == 2 else None,
-                        'down': self.face_colors[3] if k == 2 else None,
+                        'left': self.face_colors[1] if k == 0 else None,
+                        'right': self.face_colors[2] if k == 2 else None,
+                        'down': self.face_colors[3] if j == 2 else None,
                         'back': self.face_colors[4] if i == 2 else None,
-                        'up': self.face_colors[5] if k == 0 else None,
+                        'up': self.face_colors[5] if j == 0 else None,
                     }
                     # Derive Face Count from number of colored sides
                     face_count = sum(color is not None for color in color_dict.values())
@@ -64,18 +64,21 @@ class Cube:
     def _get_face_colors(self, face_key):
         '''
         Helper Method to retrieve colors of a specific face of the cube.
+
+        face_key: side that colors are being pulled from
         '''
         indices = self.segment_indices.get(face_key)
         if not indices:
             raise ValueError(f"Invalid face key: {face_key}")
 
         # Initialize a 3x3 matrix of None
-        colors = [[None] * 3 for _ in range(3)]
+        colors = np.empty((3, 3), dtype=object)
+        colors.fill(None)
 
         # Accessing the color of each block in the face and storing it
         for i in range(3):
             for j in range(3):
-                block = self.blocks[indices][i, j]
+                block = self.blocks[indices[0], indices[1], indices[2]][i, j]
                 colors[i][j] = block.color_dict[face_key]
 
         return colors
@@ -143,14 +146,14 @@ class Cube:
             layer = layer.T
             TRANSPOSE = True
 
-        layer_r = np.rot90(layer, k=ROTATION)
+        layer_r = np.rot90(layer, k=ROTATION).copy()
 
         if TRANSPOSE:
             layer_r = layer_r.T
 
         for i in range(3):
             for j in range(3):
-                layer_r[i, j] = layer_r[i, j].movement(segment, clockwise)
+                layer_r[i, j].movement(segment, clockwise)
 
         self.blocks[indices] = layer_r
 
