@@ -86,4 +86,7 @@ class Block:
             face1, face2 = movement
             color_copy = self.color_dict.copy()
             self.color_dict[face1] = color_copy[face2]
-        return 
+
+        new_face_count = sum(color is not None for color in self.color_dict.values())
+        if new_face_count != self.face_count:
+            raise ValueError(f'Face Count Error. Initial Face Count: {self.face_count}. New Face Count: {new_face_count}. \n {self.color_dict}')

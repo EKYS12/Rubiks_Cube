@@ -79,6 +79,7 @@ class Cube:
         for i in range(3):
             for j in range(3):
                 block = self.blocks[indices[0], indices[1], indices[2]][i, j]
+                print(block)
                 colors[i][j] = block.color_dict[face_key]
 
         return colors
