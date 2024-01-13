@@ -4,12 +4,6 @@ This is the class for the blocks that build up the Rubiks Cube
 Face count determines if the piece is a center face piece, an edge piece, or a corner piece.
 
 Color dictionary determines the initial placement of the colors on the block.
-
-Example Color Dictionary:
-    color_dict = {front: "white", left: "green", right: "null", down: "null", back: "red", up: "null"}
-
-Example Movement Log:
-    movement_log = [("front", "back"), ("back", "down"), ("left", "front")]
 '''
 
 class Block:
@@ -23,6 +17,12 @@ class Block:
         return str(color_str)
 
     def _log_maker(self, segment, clockwise=True):
+        '''
+        Function that creates the movement log as a list of tuples to determine how sides will shift during a rotation.
+
+        segment: Side of the cube that is being rotated.
+        clockwise: Default=True. Direction of rotation being done.
+        '''
         if (segment in ['front', 'c_slicing'] and clockwise) or (segment in ['back'] and not clockwise):
             movement_log = [
                 ('front', 'front'),
@@ -81,6 +81,13 @@ class Block:
         return movement_log
 
     def movement(self, segment, clockwise=True):
+        '''
+        Function that reworks the block's color dictionary as a movement along the cube takes place.
+
+        segment: Side on the cube that is being rotated.
+
+        clockwise: Default=True. Direction of rotation.
+        '''
         movement_log = self._log_maker(segment=segment, clockwise=clockwise)
         color_copy = self.color_dict.copy()
         for movement in movement_log:

@@ -79,7 +79,6 @@ class Cube:
         for i in range(3):
             for j in range(3):
                 block = self.blocks[indices[0], indices[1], indices[2]][i, j]
-                print(block)
                 colors[i][j] = block.color_dict[face_key]
 
         return colors
@@ -93,6 +92,19 @@ class Cube:
         for side in sides:
             cube_str += f"{side.capitalize()} Side:\n"
             face_colors = self._get_face_colors(side)
+
+            # If side is left or up, reverse the order of rows to match 2D layout representation of cube.
+            if side in sides[1] or side in sides[3]:
+                face_colors = np.flip(face_colors, axis=0)
+
+            # if side is the back, flip the matrix so that 
+            if side in sides[4]:
+                face_colors = np.flip(face_colors, axis=1)
+
+            # If side is left or right, Transpose so that the order is correct upon visual representation.
+            if side in sides[1:3]:
+                face_colors = face_colors.T
+
             for row in face_colors:
                 cube_str += ''.join(color[0] if color else ' ' for color in row) + '\n'
             cube_str += '\n'
