@@ -82,9 +82,9 @@ class Block:
 
     def movement(self, segment, clockwise=True):
         movement_log = self._log_maker(segment=segment, clockwise=clockwise)
+        color_copy = self.color_dict.copy()
         for movement in movement_log:
             face1, face2 = movement
-            color_copy = self.color_dict.copy()
             self.color_dict[face1] = color_copy[face2]
 
         new_face_count = sum(color is not None for color in self.color_dict.values())
