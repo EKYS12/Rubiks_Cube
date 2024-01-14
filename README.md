@@ -1,30 +1,12 @@
 # Rubik's Cube Project
 
-## Cube Maker
-Make a 3D Array that is a solved Rubik's Cube
+This is a personal project with the intention of making a digital rubik's cube. Using just base python 3.10 along with the addition of the powerful library `NumPy`, a functioning rubik's cube can be made in your vary own terminal.
 
-Composed of 4 types of blocks
-- Core (Unseen, cannot move)
-- Face (Seen, cannot move)
-- Edge (Seen, can move)
-- Corner (Seen, can move)
+## Cube
+Using NumPy we can create a 3D Array that is a representation of a Rubik's Cube. Each element of the 3x3x3 array contain a Block object, where the orientation of the block and it's colors are shown in dictionary for sides and colors. The cube gets printed out as seperate 3x3 matrices of each of it's sides layed out in 2D.
 
 ## Cube Rotation Functions
-Functions for each legal rotation/movement
-
-Rotation can be clockwise or counter clockwise centering around a face block
-
-Rotations are to target the movements of specific corner or edge blocks
-
-The Functions arguements must be movement and face block. These will be determined by algorithm functions
+The cube object also contains methods for rotating it's different segments. These methods will both rotate the segment of the cube selected in the direction chosen, but will also update the blocks within the segment with their new orientations as they move around the cube.
 
 ## Cube Randomizer
-Function that takes a solved cube and randomly picks a sequence of *200* movements to perform on the cube to randomize it.
-
-## Cube Solver
-Create Functions for different Cube solving Algorithms that use the movement functions to perform it's steps.
-
-Attach a timer function and a movement counting function to each algorithm. Store the time and step count in a dataframe.
-
-# Data Collection
-Data frame that stores step count and time for each algorithm for each random cube variation. 
+The cube when first initialized is created in a solved state. Using the scramble function we can randomize the layout of the cube and begin solving it.

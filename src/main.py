@@ -1,13 +1,27 @@
+from lib.utils import home
 from lib.cube import Cube
 
-new_cube = Cube()
+'''
+Outline for new code:
 
-print(new_cube)
+Ask User to make a new code or exit.
 
-print(f"The rubik's cube is: {new_cube.check_state()}")
+New cube is made.
 
-new_cube.scramble(seed=42)
+Ask to preform move, scramble, help, or back.
 
-print(new_cube)
+Preforming move asks user to input move and returns user to previous screen, but locks scrambles.
 
-print(f"The rubik's cube is: {new_cube.check_state()}")
+Preforming scramble will scramble the cube, save the seed, and return user to the previous screen.
+
+Preforming help will give user information about rotations and scramble.
+
+Preforming back will take them back to first screen.
+'''
+
+make_cube = home()
+
+if make_cube:
+    cube = Cube()
+
+
