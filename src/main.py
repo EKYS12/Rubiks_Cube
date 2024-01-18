@@ -1,4 +1,4 @@
-from lib.utils import home
+import lib.menu as menu
 from lib.cube import Cube
 
 '''
@@ -19,9 +19,10 @@ Preforming help will give user information about rotations and scramble.
 Preforming back will take them back to first screen.
 '''
 
-make_cube = home()
+make_cube = menu.home()
 
-if make_cube:
-    cube = Cube()
+cube = Cube()
+
+menu.cube_menu(cube)
 
 
